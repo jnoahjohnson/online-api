@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=
+    , initial-scale=1.0"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="text-center sm:text-left" id="header">
+      <div id="crumbs"></div>
+      <div id="centerhead">
+        <div class="title">The Scriptures, Mapped</div>
+        <div class="subtitle">By Allessandra Baker</div>
+      </div>
+    </div>
+    <div class="flex flex-col-reverse sm:flex-row" id="content">
+      <div class="w-full h-24 sm:w-64 sm:h-full" id="scriptures">
+        <div id="scripnav1"></div>
+        <div id="scripnav2"></div>
+      </div>
+
+      <div class="w-full h-full" id="map"></div>
+    </div>
+    <script>
+      $(function () {
+        //Animations
+        const ANIMATION_DURATION = 350;
+        const ANIMATION_TYPE_SLIDE_LEFT = "left";
+        const ANIMATION_TYPE_SLIDE_RIGHT = "right";
+        const POSITION_BEHIND_MAP = "100%";
+        const POSITION_OFFSCREEN_LEFT = "-100%";
+        const POSITION_VISABLE = "0px";
+        const OPAQUE = 1;
+        const TRANSPARENT = 0;
+        let visableDiv = $("#chapter1");
+        let invisableDiv = $("#chapter2");
+        let count = 1;
+        const animateToNewContent = function (content, animationType) {
+          invisableDiv.html(content);
+          if (animationType === ANIMATION_TYPE_SLIDE_LEFT) {
+            slideFromLeft();
+          } else if (animationType === ANIMATION_TYPE_SLIDE_RIGHT) {
+            slideFromRight();
+          } else {
+            crossFade();
+          }
+        };
+        const nextContent = function () {
+          count += 1;
+          return `The overall count is now ${count}`;
+        };
+        const swapDivs = function () {
+          let temp = visableDiv;
+          visableDiv = invisableDiv;
+          invisableDiv = temp;
+        };
+        const slideFromRight = function () {
+          //populateContent();
+          invisableDiv.css({ left: POSITION_BEHIND_MAP, opacity: OPAQUE });
+          invisableDiv.animate({ left: POSITION_VISABLE }, ANIMATION_DURATION);
+          visableDiv.animate(
+            { left: POSITION_OFFSCREEN_LEFT },
+            ANIMATION_DURATION,
+            swapDivs
+          );
+        };
+        const slideFromLeft = function () {
+          //populateContent();
+          invisableDiv.css({ left: POSITION_OFFSCREEN_LEFT, opacity: OPAQUE });
+          invisableDiv.animate({ left: POSITION_VISABLE }, ANIMATION_DURATION);
+          visableDiv.animate(
+            { left: POSITION_BEHIND_MAP },
+            ANIMATION_DURATION,
+            swapDivs
+          );
+        };
+
+        const crossFade = function () {
+          //populateContent();
+          invisableDiv.css({ left: POSITION_VISABLE, opacity: TRANSPARENT });
+          const hideIfTransparent = function () {
+            swapDivs();
+            invisableDiv.css({ left: POSITION_OFFSCREEN_LEFT });
+          };
+          visableDiv.animate({ opacity: TRANSPARENT }, ANIMATION_DURATION);
+          invisableDiv.animate(
+            { opacity: OPAQUE },
+            ANIMATION_DURATION,
+            hideIfTransparent
+          );
+        };
+
+        visableDiv.click(() => {
+          animateToNewContent(nextContent(), ANIMATION_TYPE_SLIDE_RIGHT);
+        });
+        invisableDiv.click(() => {
+          animateToNewContent(nextContent(), ANIMATION_TYPE_SLIDE_LEFT);
+        });
+        $(".map").click(() => {
+          animateToNewContent(nextContent());
+        });
+      });
+    </script>
+  </body>
+</html>
